@@ -12,7 +12,15 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import ro.armanca.concabclient.Model.ClientModel;
+import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.R;
 
 public class Common {
@@ -20,8 +28,12 @@ public class Common {
     public static final String TOKEN_REFERENCE = "Token";
     public static final String NOTI_CONTENT = "body";
     public static final String NOTI_TITLE = "title";
+    public static final String DRIVER_LOCATION_REFERENCE = "DriversLocation";
+    public static final String DRIVER_INFO_REFERENCE = "DriverInfo";
 
     public static ClientModel currentClient;
+    public static Set<DriverGeoModel> driversFound = new HashSet<DriverGeoModel>();
+    public static HashMap<String, Marker> markerList = new HashMap<>();
 
     public static String buildWelcomeMessage() {
 
@@ -71,4 +83,7 @@ public class Common {
         notificationManager.notify(id,notification);
     }
 
+    public static String buildName(String firstName, String lastName) {
+        return  new StringBuilder(firstName).append(" ").append(lastName).toString();
+    }
 }

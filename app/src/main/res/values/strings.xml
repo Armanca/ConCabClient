@@ -16,4 +16,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_sign_out">Sign out</string>
     <string name="title_activity_maps">Map</string>
+    <string name="permission_require">Location permission required</string>
+    <string name="drivers_not_found">Nu sunt soferi disponibili</string>
+    <string name="not_key_drivers">Not found driver with key</string>
 </resources>
