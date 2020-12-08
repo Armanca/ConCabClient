@@ -2,8 +2,6 @@ package ro.armanca.concabclient.Model;
 
 import com.firebase.geofire.GeoLocation;
 
-import ro.armanca.concabclient.ui.home.DriverInfoModel;
-
 public class DriverGeoModel {
     private String key;
     private GeoLocation geoLocation;

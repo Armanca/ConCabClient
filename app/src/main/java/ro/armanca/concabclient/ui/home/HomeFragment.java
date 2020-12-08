@@ -1,30 +1,23 @@
 package ro.armanca.concabclient.ui.home;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.provider.Telephony;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -43,8 +36,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -52,7 +43,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -65,14 +55,13 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.internal.operators.observable.ObservableFromIterable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Callback.IFFirebaseDriverInfoListener;
 import ro.armanca.concabclient.Callback.IFFirebaseFailedListener;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
+import ro.armanca.concabclient.Model.DriverInfoModel;
 import ro.armanca.concabclient.Model.GeoQueryModel;
 import ro.armanca.concabclient.R;
 
@@ -91,7 +80,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     private static final double LIMIT_RANGE = 8.0; //kilometrii distanta
     private Location previousLocation, currentLocation;  // pt a calcula distanta
 
-    private boolean firstTIme = true;
+    private boolean firstTime = true;
 
     //Listener
     IFFirebaseDriverInfoListener ifFirebaseDriverInfoListener;
@@ -145,9 +134,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPosition, 18f));
 
                 //recalculare distanta si incarcare soferi
-                if (firstTIme) {
+                if (firstTime) {
                     previousLocation = currentLocation = locationResult.getLastLocation();
-                    firstTIme = false;
+                    firstTime = false;
                 } else {
                     previousLocation = currentLocation;
                     currentLocation = locationResult.getLastLocation();

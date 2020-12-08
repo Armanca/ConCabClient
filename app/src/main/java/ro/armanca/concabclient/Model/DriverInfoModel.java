@@ -1,4 +1,4 @@
-package ro.armanca.concabclient.ui.home;
+package ro.armanca.concabclient.Model;
 
 public class DriverInfoModel {
     private  String firstName, lastName, phoneNumber, avatar;

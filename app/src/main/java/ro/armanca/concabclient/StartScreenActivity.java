@@ -109,7 +109,6 @@ public class StartScreenActivity extends AppCompatActivity {
 
                         });
 
-
                 checkUserFromFirebase();
             }
             else
