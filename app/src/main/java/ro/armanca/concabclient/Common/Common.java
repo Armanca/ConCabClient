@@ -35,6 +35,7 @@ public class Common {
     public static final String DRIVER_LOCATION_REFERENCE = "DriversLocation";
     public static final String DRIVER_INFO_REFERENCE = "DriverInfo";
 
+
     public static ClientModel currentClient;
     public static Set<DriverGeoModel> driversFound = new HashSet<DriverGeoModel>();
     public static HashMap<String, Marker> markerList = new HashMap<>();
