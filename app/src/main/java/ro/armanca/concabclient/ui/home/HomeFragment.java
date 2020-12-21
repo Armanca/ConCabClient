@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +28,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -41,6 +43,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -54,15 +60,19 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -79,6 +89,13 @@ import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFirebaseFailedListener, IFFirebaseDriverInfoListener {
+
+    @BindView(R.id.activity_main)
+    SlidingUpPanelLayout slidingUpPanelLayout;
+    @BindView(R.id.txt_welcome)
+    TextView txt_welcome;
+
+    private AutocompleteSupportFragment autocompleteSupportFragment;
 
     private HomeViewModel homeViewModel;
     private GoogleMap mMap;
@@ -103,12 +120,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private IGoogleAPI iGoogleAPI;
 
-    private List<LatLng> polylineList = new ArrayList<>();
-    private Handler handler;
-    private int index, next;
-    private LatLng start, end;
-    private float v;
-    private double lat, lng;
 
     @Override
     public void onStop() {
@@ -134,6 +145,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         init();
+        initViews(root);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -143,7 +155,33 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         return root;
     }
 
+    private void initViews(View root) {
+        ButterKnife.bind(this,root);
+
+        Common.setVWelcomeMessage(txt_welcome);
+    }
+
     private void init() {
+
+        Places.initialize(getContext(),getString(R.string.google_maps_key));
+        autocompleteSupportFragment = (AutocompleteSupportFragment)getChildFragmentManager()
+            .findFragmentById(R.id.autocomplete_fragment);
+        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.ID,Place.Field.ADDRESS,Place.Field.NAME,Place.Field.LAT_LNG));
+        autocompleteSupportFragment.setHint(getString(R.string.where_to));
+        autocompleteSupportFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Snackbar.make(getView(),""+place.getLatLng(),Snackbar.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Snackbar.make(getView(),""+status.getStatusMessage(),Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+
 
         iGoogleAPI = RetrofitClient.getInstance().create(IGoogleAPI.class);
 
@@ -168,6 +206,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                 if (firstTime) {
                     previousLocation = currentLocation = locationResult.getLastLocation();
                     firstTime = false;
+
+                    setRestrictPlacesInCountry( locationResult.getLastLocation());
                 } else {
                     previousLocation = currentLocation;
                     currentLocation = locationResult.getLastLocation();
@@ -193,6 +233,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         loadAvailableDrivers();
     }
 
+    private void setRestrictPlacesInCountry(Location location) {
+        try{
+            Geocoder geocoder = new Geocoder(getContext(),Locale.getDefault());
+            List<Address> addressesList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+            if(addressesList.size() >0 )
+            autocompleteSupportFragment.setCountry(addressesList.get(0).getCountryCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void loadAvailableDrivers() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -207,88 +260,91 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                     List<Address> addressList;
                     try {
                         addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                        cityName = addressList.get(0).getLocality();
+                       if(addressList.size() >0 )
+                             cityName = addressList.get(0).getLocality();
+                       if(!TextUtils.isEmpty(cityName)) {
+                           //query
+                           DatabaseReference driver_location_ref = FirebaseDatabase.getInstance()
+                                   .getReference(Common.DRIVER_LOCATION_REFERENCE)
+                                   .child(cityName);
+                           GeoFire geoF = new GeoFire(driver_location_ref);
+                           GeoQuery geoQuery = geoF.queryAtLocation(new GeoLocation(location.getLatitude(),
+                                   location.getLongitude()), distance);
+                           geoQuery.removeAllListeners();
 
-                        //query
-                        DatabaseReference driver_location_ref = FirebaseDatabase.getInstance()
-                                .getReference(Common.DRIVER_LOCATION_REFERENCE)
-                                .child(cityName);
-                        GeoFire geoF = new GeoFire(driver_location_ref);
-                        GeoQuery geoQuery = geoF.queryAtLocation(new GeoLocation(location.getLatitude(),
-                                location.getLongitude()), distance);
-                        geoQuery.removeAllListeners();
+                           geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                               @Override
+                               public void onKeyEntered(String key, GeoLocation location) {
+                                   Common.driversFound.add(new DriverGeoModel(key, location));
+                               }
 
-                        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                            @Override
-                            public void onKeyEntered(String key, GeoLocation location) {
-                                Common.driversFound.add(new DriverGeoModel(key, location));
-                            }
+                               @Override
+                               public void onKeyExited(String key) {
 
-                            @Override
-                            public void onKeyExited(String key) {
+                               }
 
-                            }
+                               @Override
+                               public void onKeyMoved(String key, GeoLocation location) {
 
-                            @Override
-                            public void onKeyMoved(String key, GeoLocation location) {
+                               }
 
-                            }
+                               @Override
+                               public void onGeoQueryReady() {
+                                   if (distance <= LIMIT_RANGE) {
+                                       distance++;
+                                       loadAvailableDrivers(); //cautam in continuare
+                                   } else {
+                                       distance = 1.0;//initializare de la inceput
+                                       addDriverMarker();
+                                   }
+                               }
 
-                            @Override
-                            public void onGeoQueryReady() {
-                                if (distance <= LIMIT_RANGE) {
-                                    distance++;
-                                    loadAvailableDrivers(); //cautam in continuare
-                                } else {
-                                    distance = 1.0;//initializare de la inceput
-                                    addDriverMarker();
-                                }
-                            }
+                               @Override
+                               public void onGeoQueryError(DatabaseError error) {
+                                   Snackbar.make(getView(), error.getMessage(), Snackbar.LENGTH_SHORT).show();
+                               }
+                           });
 
-                            @Override
-                            public void onGeoQueryError(DatabaseError error) {
-                                Snackbar.make(getView(), error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
+                           driver_location_ref.addChildEventListener(new ChildEventListener() {
+                               @Override
+                               public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                        driver_location_ref.addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                   GeoQueryModel geoQueryModel = snapshot.getValue(GeoQueryModel.class);
+                                   GeoLocation geoLocation = new GeoLocation(geoQueryModel.getL().get(0),
+                                           geoQueryModel.getL().get(1));
+                                   DriverGeoModel driverGeoModel = new DriverGeoModel(snapshot.getKey(), geoLocation);
+                                   Location newDriverLocation = new Location("");
+                                   newDriverLocation.setLatitude(geoLocation.latitude);
+                                   newDriverLocation.setLongitude(geoLocation.longitude);
+                                   float distance = location.distanceTo(newDriverLocation) / 1000;
+                                   if (distance <= LIMIT_RANGE)
+                                       findDriverByKey(driverGeoModel);
 
-                                GeoQueryModel geoQueryModel = snapshot.getValue(GeoQueryModel.class);
-                                GeoLocation geoLocation = new GeoLocation(geoQueryModel.getL().get(0),
-                                        geoQueryModel.getL().get(1));
-                                DriverGeoModel driverGeoModel = new DriverGeoModel(snapshot.getKey(), geoLocation);
-                                Location newDriverLocation = new Location("");
-                                newDriverLocation.setLatitude(geoLocation.latitude);
-                                newDriverLocation.setLongitude(geoLocation.longitude);
-                                float distance = location.distanceTo(newDriverLocation) / 1000;
-                                if (distance <= LIMIT_RANGE)
-                                    findDriverByKey(driverGeoModel);
+                               }
 
-                            }
+                               @Override
+                               public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                            @Override
-                            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                               }
 
-                            }
+                               @Override
+                               public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-                            @Override
-                            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                               }
 
-                            }
+                               @Override
+                               public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                            @Override
-                            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                               }
 
-                            }
+                               @Override
+                               public void onCancelled(@NonNull DatabaseError error) {
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-
+                               }
+                           });
+                       }
+                       else
+                           Snackbar.make(getView(),getString(R.string.city_name_empty),Snackbar.LENGTH_LONG).show();
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -324,7 +380,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.hasChildren()) {
                             driverGeoModel.setDriverInfoModel(snapshot.getValue(DriverInfoModel.class));
-                            ifFirebaseDriverInfoListener.onDriverInfoLoadSucces(driverGeoModel);
+                            ifFirebaseDriverInfoListener.onDriverInfoLoadSuccess(driverGeoModel);
                         } else {
                             ifFirebaseFailedListener.onFirebaseLoadFailed(getString(R.string.not_key_drivers) + driverGeoModel.getKey());
 
@@ -413,17 +469,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     }
 
     @Override
-    public void onDriverInfoLoadSucces(DriverGeoModel driverGeoModel) {
+    public void onDriverInfoLoadSuccess(DriverGeoModel driverGeoModel) {
         if (!Common.markerList.containsKey(driverGeoModel.getKey()))
             Common.markerList.put(driverGeoModel.getKey(),
                     mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(driverGeoModel.getGeoLocation().latitude,
-                                    driverGeoModel.getGeoLocation().longitude))
-                            .flat(true)
-                            .title(Common.buildName(driverGeoModel.getDriverInfoModel().getFirstName(),
-                                    driverGeoModel.getDriverInfoModel().getLastName()))
-                            .snippet(driverGeoModel.getDriverInfoModel().getPhoneNumber())
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_car_traseu))));
+                    .position(new LatLng(driverGeoModel.getGeoLocation().latitude,
+                            driverGeoModel.getGeoLocation().longitude))
+                    .flat(true)
+                    .title(Common.buildName(driverGeoModel.getDriverInfoModel().getFirstName(),
+                            driverGeoModel.getDriverInfoModel().getLastName()))
+                    .snippet(driverGeoModel.getDriverInfoModel().getPhoneNumber())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_car_traseu))));
 
         if (!TextUtils.isEmpty(cityName))
         {
@@ -506,44 +562,57 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                         JSONObject route = jsonArray.getJSONObject(i);
                         JSONObject poly = route.getJSONObject("overview_polyline");
                         String polyline = poly.getString("points");
-                        polylineList = Common.decodePoly(polyline);
+                      //  polylineList = Common.decodePoly(polyline);
+                        animationModel.setPolylineList(Common.decodePoly(polyline));
                     }
 
 
-                    handler = new Handler();
-                    index = -1;
-                    next = 1;
+
+               //     index = -1;
+                //    next = 1;
+                    animationModel.setIndex(1);
+                    animationModel.setNext(1);
+
 
                     Runnable runnable = new Runnable() {
                         @Override
                         public void run() {
-                        if(polylineList.size() > 1 )
+                        if(animationModel.getPolylineList()!= null && animationModel.getPolylineList().size() > 1 )
                         {
-                            if(index< polylineList.size() - 2){
-                                index++;
-                                next=index+1;
-                                start = polylineList.get(index);
-                                end = polylineList.get(next);
+                            if(animationModel.getIndex() < animationModel.getPolylineList().size() - 2){
+                               // index++;
+                                animationModel.setIndex(animationModel.getNext()+1);
+                               // next=index+1;
+                                animationModel.setNext(animationModel.getIndex()+1);
+                                //start = polylineList.get(index);
+                                animationModel.setStart(animationModel.getPolylineList().get(animationModel.getIndex()));
+                               // end = polylineList.get(next);
+                                animationModel.setEnd(animationModel.getPolylineList().get(animationModel.getNext()));
                             }
 
-                            ValueAnimator valueAnimator = new ValueAnimator().ofInt(0,1);
+                            ValueAnimator valueAnimator = ValueAnimator.ofInt(0,1);
                             valueAnimator.setDuration(3000);
                             valueAnimator.setInterpolator(new LinearInterpolator());
                             valueAnimator.addUpdateListener(animation -> {
-                                v = animation.getAnimatedFraction();
-                                lat=v*end.latitude + (1-v)*start.latitude;
-                                lng=v*end.longitude + (1-v)*start.longitude;
-                                LatLng newPos= new LatLng(lat,lng);
+                              //  v = animation.getAnimatedFraction();
+                                animationModel.setV(animation.getAnimatedFraction());
+                               // lat=v*end.latitude + (1-v)*start.latitude;
+                                animationModel.setLat(animationModel.getV() * animationModel.getEnd().latitude + (1- animationModel.getV())
+                                * animationModel.getStart().latitude);
+                               // lng=v*end.longitude + (1-v)*start.longitude;
+                                animationModel.setLng(animationModel.getV() * animationModel.getEnd().longitude + (1- animationModel.getV())
+                                        * animationModel.getStart().longitude);
+                                LatLng newPos= new LatLng(animationModel.getLat(),animationModel.getLng());
                                 currentMarker.setPosition(newPos);
                                 currentMarker.setAnchor(0.5f,0.5f);
-                                currentMarker.setRotation(Common.getBearing(start,newPos));
+                                currentMarker.setRotation(Common.getBearing(animationModel.getStart(),newPos));
 
                             });
 
                             valueAnimator.start();
-                            if(index < polylineList.size() - 2)
-                                handler.postDelayed(this,1500);
-                            else if (index < polylineList.size() -1 )
+                            if(animationModel.getIndex() < animationModel.getPolylineList().size() - 2)
+                                animationModel.getHandler().postDelayed(this,1500);
+                            else if (animationModel.getIndex() < animationModel.getPolylineList().size() -1 )
                             {
                                 animationModel.setRun(false);
                                 Common.driverLocationSubscribe.put(key,animationModel); //se face update
@@ -552,7 +621,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                         }
                     };
 
-                    handler.postDelayed(runnable,1500);
+                    animationModel.getHandler().postDelayed(runnable,1500);
 
                 }
                 catch (Exception e){

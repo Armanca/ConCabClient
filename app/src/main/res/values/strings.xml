@@ -19,4 +19,8 @@
     <string name="permission_require">Location permission required</string>
     <string name="drivers_not_found">Nu sunt soferi disponibili</string>
     <string name="not_key_drivers">Not found driver with key</string>
+    <string name="welcome">Bine ati venit!</string>
+    <string name="choose_a_saved_place">Alegeti un loc salvat</string>
+    <string name="where_to">Încotro?</string>
+    <string name="city_name_empty">Numele orasului este gol.</string>
 </resources>
