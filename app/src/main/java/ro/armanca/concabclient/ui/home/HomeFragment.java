@@ -2,6 +2,7 @@ package ro.armanca.concabclient.ui.home;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -43,6 +44,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
@@ -62,6 +64,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -83,10 +86,12 @@ import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.AnimationModel;
 import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.Model.DriverInfoModel;
+import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Model.GeoQueryModel;
 import ro.armanca.concabclient.R;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
+import ro.armanca.concabclient.RequestDriverActivity;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFirebaseFailedListener, IFFirebaseDriverInfoListener {
 
@@ -156,22 +161,37 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     }
 
     private void initViews(View root) {
-        ButterKnife.bind(this,root);
+        ButterKnife.bind(this, root);
 
         Common.setVWelcomeMessage(txt_welcome);
     }
 
     private void init() {
 
-        Places.initialize(getContext(),getString(R.string.google_maps_key));
-        autocompleteSupportFragment = (AutocompleteSupportFragment)getChildFragmentManager()
-            .findFragmentById(R.id.autocomplete_fragment);
-        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.ID,Place.Field.ADDRESS,Place.Field.NAME,Place.Field.LAT_LNG));
+        Places.initialize(getContext(), getString(R.string.google_maps_key));
+        autocompleteSupportFragment = (AutocompleteSupportFragment) getChildFragmentManager()
+                .findFragmentById(R.id.autocomplete_fragment);
+        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.NAME, Place.Field.LAT_LNG));
         autocompleteSupportFragment.setHint(getString(R.string.where_to));
         autocompleteSupportFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                Snackbar.make(getView(),""+place.getLatLng(),Snackbar.LENGTH_LONG).show();
+                //Snackbar.make(getView(),""+place.getLatLng(),Snackbar.LENGTH_LONG).show();
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(getView(),getString(R.string.permission_require),Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                fusedLocationProviderClient.getLastLocation()
+                        .addOnSuccessListener(location -> {
+
+                            LatLng origin = new LatLng(location.getLatitude(),location.getLongitude());
+                            LatLng destination = new LatLng(place.getLatLng().latitude,place.getLatLng().longitude);
+
+                            startActivity(new Intent(getContext(), RequestDriverActivity.class));
+                            EventBus.getDefault().postSticky(new SelectPlaceEvent(origin,destination));
+
+                        });
 
             }
 

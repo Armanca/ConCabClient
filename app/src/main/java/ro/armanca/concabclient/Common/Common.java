@@ -148,4 +148,16 @@ public class Common {
         else
             txt_welcome.setText(new StringBuilder("Bună seara!"));
     }
+
+    public static String formatDurata(String duration) {
+        if(duration.contains("mins"))
+            return duration.substring(0,duration.length()); //
+        else
+            return duration;
+    }
+
+    public static String formatAdresa(String start_address) {
+        int firstIndexOfComma = start_address.indexOf(",");
+        return  start_address.substring(0,firstIndexOfComma);
+    }
 }
