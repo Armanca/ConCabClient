@@ -57,8 +57,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/confirm_pickup"
-                android:background="@color/colorAccent"
-                android:textColor="@android:color/white"/>
+                android:background="@color/ic_launcher_background"
+                android:textColor="@color/colorAccent"/>
 
         </LinearLayout>
 

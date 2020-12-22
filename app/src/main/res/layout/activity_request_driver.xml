@@ -8,13 +8,29 @@
         android:orientation="vertical"
         tools:context=".RequestDriverActivity" >
 
-    <fragment
-        android:id="@+id/map"
+    <FrameLayout
+        android:layout_above="@+id/confirm_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        tools:context=".RequestDriverActivity"
-        />
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            tools:context=".RequestDriverActivity"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:id="@+id/fill_maps"
+            android:background="@color/map_darker"
+            />
+
+    </FrameLayout>
+
 
     <FrameLayout
         android:id="@+id/confirm_layout"
@@ -25,6 +41,9 @@
         <include layout="@layout/layout_confirm_concab"/>
 
         <include layout="@layout/layout_confirm_pickup"/>
+
+        <include layout="@layout/layout_finding_your_driver"/>
+
     </FrameLayout>
 
 </RelativeLayout>
