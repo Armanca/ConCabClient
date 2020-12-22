@@ -38,6 +38,9 @@ public class Common {
     public static final String NOTI_TITLE = "title";
     public static final String DRIVER_LOCATION_REFERENCE = "DriversLocation";
     public static final String DRIVER_INFO_REFERENCE = "DriverInfo";
+    public static final String REQUEST_DRIVER_TITLE = "RequestDriver";
+    public static final String CLIENT_PICKUP_LOCATION ="PickupLocation";
+    public static final String CLIENT_KEY ="ClientKey";
 
 
     public static ClientModel currentClient;

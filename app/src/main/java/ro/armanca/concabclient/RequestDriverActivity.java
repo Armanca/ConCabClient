@@ -61,6 +61,7 @@ import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
+import ro.armanca.concabclient.Utils.UserUtils;
 
 public class RequestDriverActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -210,10 +211,11 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                         min_distance = driverLocation.distanceTo(currentClientLocation);
                         foundDriver=Common.driversFound.get(key);
                     }
-                    Snackbar.make(main_layout,new StringBuilder("A fost găsit un șofer: ")
-                                .append(foundDriver.getDriverInfoModel().getFirstName())
-                            .append(" ")
-                            .append(foundDriver.getDriverInfoModel().getPhoneNumber()),Snackbar.LENGTH_LONG).show();
+ //                   Snackbar.make(main_layout,new StringBuilder("A fost găsit un șofer: ")
+ //                               .append(foundDriver.getDriverInfoModel().getFirstName())
+   //                         .append(" ")
+     //                       .append(foundDriver.getDriverInfoModel().getPhoneNumber()),Snackbar.LENGTH_LONG).show();
+                UserUtils.sendRequestDriver(this,main_layout,foundDriver,target);
 
             }
         }

@@ -30,4 +30,6 @@
     <string name="address_demo">Peana nr 12 Cluj-Napoca, Cluj</string>
     <string name="meet_driver_here">Întâlnește aici șoferul</string>
     <string name="finding_your_ride">Căutare cursă</string>
+    <string name="token_not_found">Token not found!</string>
+    <string name="request_driver_failed">Trimiterea cererii către șofer a eșuat</string>
 </resources>
