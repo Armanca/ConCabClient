@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,6 +57,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
+import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
@@ -77,6 +80,9 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
     @BindView(R.id.fill_maps)
     View fill_maps;
+
+    @BindView(R.id.main_layout)
+    RelativeLayout main_layout;
 
     private Circle lastUserCircle;
     private long duration = 1000;
@@ -152,7 +158,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
         });
 
-        startMapCameraSpinningAnimation(mMap.getCameraPosition().target);
+        startMapCameraSpinningAnimation(origin);
 
     }
 
@@ -173,6 +179,50 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         });
         animator.start();
 
+        //dupa animare, gasim un sofer;
+        findNearbyDriver(target);
+
+    }
+
+    private void findNearbyDriver(LatLng target) {
+        if(Common.driversFound.size()>0){
+
+            float min_distance = 0 ;
+            DriverGeoModel foundDriver = Common.driversFound.get(Common.driversFound.keySet().iterator().next());
+            Location currentClientLocation = new Location("");
+            currentClientLocation.setLatitude(target.latitude);
+            currentClientLocation.setLongitude(target.longitude);
+            for(String key:Common.driversFound.keySet())
+            {
+                Location driverLocation = new Location("");
+                driverLocation.setLatitude(Common.driversFound.get(key).getGeoLocation().latitude);
+                driverLocation.setLongitude(Common.driversFound.get(key).getGeoLocation().longitude);
+
+                //Comparam 2 locatii
+                if(min_distance ==0){
+                    min_distance = driverLocation.distanceTo(currentClientLocation);
+                    foundDriver=Common.driversFound.get(key);
+                }
+                else
+                    if(driverLocation.distanceTo(currentClientLocation) < min_distance)
+                    {
+                        //daca gasim alt sofer mai aproape de client
+                        min_distance = driverLocation.distanceTo(currentClientLocation);
+                        foundDriver=Common.driversFound.get(key);
+                    }
+                    Snackbar.make(main_layout,new StringBuilder("A fost găsit un șofer: ")
+                                .append(foundDriver.getDriverInfoModel().getFirstName())
+                            .append(" ")
+                            .append(foundDriver.getDriverInfoModel().getPhoneNumber()),Snackbar.LENGTH_LONG).show();
+
+            }
+        }
+        else
+        {
+            // nu avem
+            Snackbar.make(main_layout,getString(R.string.drivers_not_found),Snackbar.LENGTH_LONG).show();
+
+        }
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ro.armanca.concabclient.Model.AnimationModel;
@@ -40,7 +41,7 @@ public class Common {
 
 
     public static ClientModel currentClient;
-    public static Set<DriverGeoModel> driversFound = new HashSet<DriverGeoModel>();
+    public static Map<String,DriverGeoModel> driversFound = new HashMap<>();
     public static HashMap<String, Marker> markerList = new HashMap<>();
     public static HashMap<String, AnimationModel> driverLocationSubscribe = new HashMap<String, AnimationModel>();
 
