@@ -41,6 +41,7 @@ public class Common {
     public static final String REQUEST_DRIVER_TITLE = "RequestDriver";
     public static final String CLIENT_PICKUP_LOCATION ="PickupLocation";
     public static final String CLIENT_KEY ="ClientKey";
+    public static final String REQUEST_DRIVER_DECLINE = "Decline";
 
 
     public static ClientModel currentClient;

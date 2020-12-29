@@ -32,4 +32,5 @@
     <string name="finding_your_ride">Căutare cursă</string>
     <string name="token_not_found">Token not found!</string>
     <string name="request_driver_failed">Trimiterea cererii către șofer a eșuat</string>
+    <string name="no_driver_accept_request">"Niciun șofer nu a acceptat cursa "</string>
 </resources>

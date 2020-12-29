@@ -149,13 +149,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        init();
-        initViews(root);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        initViews(root);
+        init();
 
         return root;
     }
@@ -208,41 +208,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         ifFirebaseFailedListener = this;
         ifFirebaseDriverInfoListener = this;
 
-        locationRequest = new LocationRequest();
-        locationRequest.setSmallestDisplacement(10f);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(3000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                LatLng newPosition = new LatLng(locationResult.getLastLocation().getLatitude(),
-                        locationResult.getLastLocation().getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPosition, 18f));
+        if(ActivityCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            Snackbar.make(mapFragment.getView(),getString(R.string.permission_require),Snackbar.LENGTH_SHORT).show();
 
-                //recalculare distanta si incarcare soferi
-                if (firstTime) {
-                    previousLocation = currentLocation = locationResult.getLastLocation();
-                    firstTime = false;
+            return;
+        }
 
-                    setRestrictPlacesInCountry( locationResult.getLastLocation());
-                } else {
-                    previousLocation = currentLocation;
-                    currentLocation = locationResult.getLastLocation();
+        buildLocationRequest();
+        buildLocationCallback();
+        updateLocation();
 
-                }
 
-                if (previousLocation.distanceTo(currentLocation) / 1000 <= LIMIT_RANGE)
-                    loadAvailableDrivers();
-                else {
-                    //nimic..lasam harta
-                }
+        loadAvailableDrivers();
+    }
 
-            }
-        };
-
+    private void updateLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -250,7 +232,51 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
-        loadAvailableDrivers();
+    }
+
+    private void buildLocationCallback() {
+        if(locationCallback == null)
+        {
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    super.onLocationResult(locationResult);
+                    LatLng newPosition = new LatLng(locationResult.getLastLocation().getLatitude(),
+                            locationResult.getLastLocation().getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPosition, 18f));
+
+                    //recalculare distanta si incarcare soferi
+                    if (firstTime) {
+                        previousLocation = currentLocation = locationResult.getLastLocation();
+                        firstTime = false;
+
+                        setRestrictPlacesInCountry( locationResult.getLastLocation());
+                    } else {
+                        previousLocation = currentLocation;
+                        currentLocation = locationResult.getLastLocation();
+
+                    }
+
+                    if (previousLocation.distanceTo(currentLocation) / 1000 <= LIMIT_RANGE)
+                        loadAvailableDrivers();
+                    else {
+                        //nimic..lasam harta
+                    }
+
+                }
+            };
+        }
+    }
+
+    private void buildLocationRequest() {
+    if(locationRequest == null)
+        {
+        locationRequest = new LocationRequest();
+        locationRequest.setSmallestDisplacement(10f);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        }
     }
 
     private void setRestrictPlacesInCountry(Location location) {
@@ -430,6 +456,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                           Snackbar.make(mapFragment.getView(),getString(R.string.permission_require),Snackbar.LENGTH_SHORT).show();
                             return;
                         }
                         mMap.setMyLocationEnabled(true);
@@ -457,6 +484,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                         params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                         params.setMargins(0, 0, 0, 250);
+
+                        buildLocationRequest();
+                        buildLocationCallback();
+                        updateLocation();
                     }
 
                     @Override
@@ -519,7 +550,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
                             Common.markerList.get(driverGeoModel.getKey()).remove();
                         Common.markerList.remove(driverGeoModel.getKey());
                         Common.driverLocationSubscribe.remove(driverGeoModel.getKey());
-                        driverLocation.removeEventListener(this);
+                        if(Common.driversFound != null && Common.driversFound.size() > 0 )
+                            Common.driversFound.remove(driverGeoModel.getKey());
+                            driverLocation.removeEventListener(this);
+
                     }
                     else
                     {
@@ -572,7 +606,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
             compositeDisposable.add(iGoogleAPI.getDirections("driving",
                     "less_driving",
                     from,to,
-                    getString(R.string.google_api_key))
+                    getActivity().getString(R.string.google_api_key))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(returnResult -> {

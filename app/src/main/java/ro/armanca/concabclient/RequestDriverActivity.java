@@ -58,6 +58,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
+import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
@@ -93,7 +94,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private ValueAnimator animator;
     private static final int DESIRED_NUM_OF_SPINS=5;
     private static final int DESIRED_SECONDS_PER_ONE_FULL_360_SPIN=40;
-
+    private DriverGeoModel lastDriverCall;
 
 
     @OnClick(R.id.btn_confirm_concab)
@@ -189,7 +190,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         if(Common.driversFound.size()>0){
 
             float min_distance = 0 ;
-            DriverGeoModel foundDriver = Common.driversFound.get(Common.driversFound.keySet().iterator().next());
+            DriverGeoModel foundDriver =null;
             Location currentClientLocation = new Location("");
             currentClientLocation.setLatitude(target.latitude);
             currentClientLocation.setLongitude(target.longitude);
@@ -200,29 +201,56 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 driverLocation.setLongitude(Common.driversFound.get(key).getGeoLocation().longitude);
 
                 //Comparam 2 locatii
-                if(min_distance ==0){
+                if(min_distance == 0){
                     min_distance = driverLocation.distanceTo(currentClientLocation);
-                    foundDriver=Common.driversFound.get(key);
+
+                    if(!Common.driversFound.get(key).isDecline())
+                    {
+                        foundDriver = Common.driversFound.get(key);
+                        break;
+                    }
+                    else
+                        continue;
                 }
                 else
                     if(driverLocation.distanceTo(currentClientLocation) < min_distance)
                     {
                         //daca gasim alt sofer mai aproape de client
                         min_distance = driverLocation.distanceTo(currentClientLocation);
-                        foundDriver=Common.driversFound.get(key);
+
+                        if(!Common.driversFound.get(key).isDecline())
+                        {
+                            foundDriver = Common.driversFound.get(key);
+                            break;
+                        }
+                        else
+                            continue;
                     }
  //                   Snackbar.make(main_layout,new StringBuilder("A fost găsit un șofer: ")
  //                               .append(foundDriver.getDriverInfoModel().getFirstName())
    //                         .append(" ")
      //                       .append(foundDriver.getDriverInfoModel().getPhoneNumber()),Snackbar.LENGTH_LONG).show();
-                UserUtils.sendRequestDriver(this,main_layout,foundDriver,target);
 
+
+            }
+
+            if(foundDriver != null){
+                UserUtils.sendRequestDriver(this,main_layout,foundDriver,target);
+                lastDriverCall = foundDriver;
+            }
+            else
+            {
+                Toast.makeText(this, getString(R.string.no_driver_accept_request), Toast.LENGTH_SHORT).show();
+                lastDriverCall = null;
+                finish();
             }
         }
         else
         {
-            // nu avem
+            // nu avem soferi
             Snackbar.make(main_layout,getString(R.string.drivers_not_found),Snackbar.LENGTH_LONG).show();
+            lastDriverCall = null;
+            finish();
 
         }
     }
@@ -273,15 +301,19 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     @Override
     protected void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if(!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop(){
         compositeDisposable.clear();
         super.onStop();
         if(EventBus.getDefault().hasSubscriberForEvent(SelectPlaceEvent.class))
             EventBus.getDefault().removeStickyEvent(SelectPlaceEvent.class);
+        if(EventBus.getDefault().hasSubscriberForEvent(DeclineRequestFromDriver.class))
+            EventBus.getDefault().removeStickyEvent(DeclineRequestFromDriver.class);
         EventBus.getDefault().unregister(this);
 
     }
@@ -290,6 +322,17 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     public void onSelectPlaceEvent(SelectPlaceEvent event){
         selectPlaceEvent = event;
 
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void onDeclineRequestEvent(DeclineRequestFromDriver event)
+    {
+        if(lastDriverCall !=  null)
+        {
+            Common.driversFound.get(lastDriverCall.getKey()).setDecline(true);
+            /// Am respins cererea de cursa, se cauta alt sofer
+            findNearbyDriver(selectPlaceEvent.getOrigin());
+        }
     }
 
     @Override
