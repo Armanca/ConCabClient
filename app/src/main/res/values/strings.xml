@@ -33,4 +33,9 @@
     <string name="token_not_found">Token not found!</string>
     <string name="request_driver_failed">Trimiterea cererii către șofer a eșuat</string>
     <string name="no_driver_accept_request">"Niciun șofer nu a acceptat cursa "</string>
+    <string name="trip_not_found">Cursa nu a fost găsită</string>
+    <string name="concab">TipMasina</string>
+    <string name="car_number">CJ98ADR</string>
+    <string name="driver_name_example">Darius</string>
+    <string name="separator">■</string>
 </resources>

@@ -25,6 +25,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
+import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Model.FCMResponse;
 import ro.armanca.concabclient.Model.FCMSendData;
 import ro.armanca.concabclient.Model.TokenModel;
@@ -57,7 +58,7 @@ public class UserUtils {
                 });
     }
 
-    public static void sendRequestDriver(Context context, RelativeLayout main_layout, DriverGeoModel foundDriver, LatLng target) {
+    public static void sendRequestDriver(Context context, RelativeLayout main_layout, DriverGeoModel foundDriver, SelectPlaceEvent selectPlaceEvent) {
         CompositeDisposable compositeDisposable = new CompositeDisposable();
         IFCMService ifcmService = RetrofitFCMClient.getInstance().create(IFCMService.class);
 
@@ -76,10 +77,19 @@ public class UserUtils {
                             notificationData.put(Common.NOTI_CONTENT,"O cerere de cursă nouă");
                             notificationData.put(Common.CLIENT_KEY,FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+                            notificationData.put(Common.CLIENT_PICKUP_LOCATION_STRING,selectPlaceEvent.getOriginString());
                             notificationData.put(Common.CLIENT_PICKUP_LOCATION, new StringBuilder("")
-                                        .append(target.latitude)
+                                        .append(selectPlaceEvent.getOrigin().latitude)
                                         .append(",")
-                                        .append(target.longitude)
+                                        .append(selectPlaceEvent.getOrigin().longitude)
+                                    .toString());
+
+
+                            notificationData.put(Common.CLIENT_DESTINATION_STRING,selectPlaceEvent.getDestinationString());
+                            notificationData.put(Common.CLIENT_DESTINATION, new StringBuilder("")
+                                    .append(selectPlaceEvent.getDestination().latitude)
+                                    .append(",")
+                                    .append(selectPlaceEvent.getDestination().longitude)
                                     .toString());
 
                             FCMSendData fcmSendData = new FCMSendData(tokenModel.getToken(),notificationData);

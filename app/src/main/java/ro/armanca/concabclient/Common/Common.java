@@ -7,15 +7,21 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Icon;
 import android.os.Build;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -30,6 +36,7 @@ import ro.armanca.concabclient.Model.AnimationModel;
 import ro.armanca.concabclient.Model.ClientModel;
 import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.R;
+import ro.armanca.concabclient.RequestDriverActivity;
 
 public class Common {
     public static final String CLIENT_INFO_REFERENCE = "ClientInfo";
@@ -42,6 +49,12 @@ public class Common {
     public static final String CLIENT_PICKUP_LOCATION ="PickupLocation";
     public static final String CLIENT_KEY ="ClientKey";
     public static final String REQUEST_DRIVER_DECLINE = "Decline";
+    public static final String CLIENT_PICKUP_LOCATION_STRING ="PickupLocationString";
+    public static final String CLIENT_DESTINATION_STRING ="DestinationLocationString";
+    public static final String CLIENT_DESTINATION = "DestinationLocation";
+    public static final String REQUEST_DRIVER_ACCEPT = "Accept";
+    public static final String TRIP_KEY = "TripKey";
+    public static final String TRIP = "Trips";
 
 
     public static ClientModel currentClient;
@@ -176,6 +189,23 @@ public class Common {
 
         va.start();
         return va;
+
+    }
+
+    public static Bitmap creatIconWithDuration(Context context, String duration) {
+        View view = LayoutInflater.from(context).inflate(R.layout.pickup_info_duration_window,null);
+        TextView txt_time = (TextView)view.findViewById(R.id.txt_duration);
+        txt_time.setText(Common.getNumberFromText(duration));
+
+        IconGenerator generator = new IconGenerator(context);
+        generator.setContentView(view);
+        generator.setBackground(new ColorDrawable(Color.TRANSPARENT));
+        return generator.makeIcon();
+
+    }
+
+    private static String getNumberFromText(String duration) {
+        return  duration.substring(0,duration.indexOf(" "));
 
     }
 }
