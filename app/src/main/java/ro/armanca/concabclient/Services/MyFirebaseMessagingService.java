@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Random;
 
 import ro.armanca.concabclient.Common.Common;
+import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
 import ro.armanca.concabclient.Utils.UserUtils;
@@ -35,6 +36,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             {
                 if(dataRecv.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
                     EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
+                }
+               else if(dataRecv.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE_AND_REMOVE_TRIP)) {
+                    EventBus.getDefault().postSticky(new DeclineAndRemoveRequestFromDriver());
                 }
 
                 else

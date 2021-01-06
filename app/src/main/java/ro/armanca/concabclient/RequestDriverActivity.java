@@ -68,6 +68,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
+import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
@@ -340,6 +341,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             EventBus.getDefault().removeStickyEvent(DeclineRequestFromDriver.class);
         if(EventBus.getDefault().hasSubscriberForEvent(DriverAcceptTripEvent.class))
             EventBus.getDefault().removeStickyEvent(DriverAcceptTripEvent.class);
+        if(EventBus.getDefault().hasSubscriberForEvent(DeclineAndRemoveRequestFromDriver.class))
+            EventBus.getDefault().removeStickyEvent(DeclineAndRemoveRequestFromDriver.class);
         EventBus.getDefault().unregister(this);
 
     }
@@ -623,6 +626,18 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             Common.driversFound.get(lastDriverCall.getKey()).setDecline(true);
             /// Am respins cererea de cursa, se cauta alt sofer
             findNearbyDriver(selectPlaceEvent);
+        }
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void onDeclineAndRemoveRequestEvent(DeclineAndRemoveRequestFromDriver event)
+    {
+        if(lastDriverCall !=  null)
+        {
+            Common.driversFound.get(lastDriverCall.getKey()).setDecline(true);
+            /// Am respins cererea de cursa si incheiem activitatea
+            finish();
+
         }
     }
 

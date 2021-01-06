@@ -85,7 +85,7 @@ public class UserUtils {
                                     .toString());
 
 
-                            notificationData.put(Common.CLIENT_DESTINATION_STRING,selectPlaceEvent.getDestinationString());
+                            notificationData.put(Common.CLIENT_DESTINATION_STRING,selectPlaceEvent.getAddress());
                             notificationData.put(Common.CLIENT_DESTINATION, new StringBuilder("")
                                     .append(selectPlaceEvent.getDestination().latitude)
                                     .append(",")
