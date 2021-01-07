@@ -114,11 +114,13 @@ public class HomeActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         TextView txt_name=(TextView)headerView.findViewById(R.id.txt_name);
         TextView txt_phone=(TextView)headerView.findViewById(R.id.txt_phone);
+        TextView text_star= (TextView)headerView.findViewById(R.id.text_star);
         img_avatar= (ImageView)headerView.findViewById(R.id.img_avatar);
 
 
         txt_name.setText(Common.buildWelcomeMessage());
         txt_phone.setText(Common.currentClient !=null ? Common.currentClient.getPhoneNumber(): "");
+        text_star.setText(Common.currentClient !=null ? String.valueOf(Common.currentClient.getRating()) : "5.0" );
 
         img_avatar.setOnClickListener(v -> {
             Intent intent = new Intent();

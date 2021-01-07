@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="bottom"
     tools:context=".HomeActivity"
-    app:umanoPanelHeight="220dp"
+    app:umanoPanelHeight="130dp"
     app:umanoShadowHeight="20dp">
 
     <fragment
@@ -72,25 +72,6 @@
             android:id="@+id/layout_choose_saved_place"
             android:layout_marginTop="10dp"
             >
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_baseline_stars_24"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/choose_a_saved_place"
-                android:fontFamily="@font/bebas_nueve_regular"
-                android:textColor="@android:color/black"
-                android:textSize="14dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"/>
 
         </LinearLayout>
 

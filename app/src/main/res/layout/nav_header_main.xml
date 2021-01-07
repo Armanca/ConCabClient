@@ -21,6 +21,28 @@
         android:src="@mipmap/ic_launcher_round"
         app:civ_border_color="@color/colorPrimary"
         app:civ_border_width="1dp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_baseline_star_24" />
+        <TextView
+            android:id="@+id/text_star"
+            android:fontFamily="@font/bebas_nueve_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:text="5.0"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txt_name"

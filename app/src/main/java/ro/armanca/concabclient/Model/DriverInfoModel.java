@@ -1,7 +1,7 @@
 package ro.armanca.concabclient.Model;
 
 public class DriverInfoModel {
-    private  String firstName, lastName, phoneNumber, avatar;
+    private  String firstName, lastName, phoneNumber, avatar,plate;
     private double rating;
 
     public DriverInfoModel(){
@@ -46,5 +46,13 @@ public class DriverInfoModel {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public String getPlate() {
+        return plate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 }

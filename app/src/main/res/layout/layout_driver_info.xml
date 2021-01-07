@@ -29,15 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
             >
-
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/icon_car_traseu"
-                    android:layout_marginLeft="50dp"
-                    android:scaleX="-1"
-                    />
-
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -50,6 +41,15 @@
 
             </FrameLayout>
 
+            <ImageView
+                
+                android:id="@+id/img_call_driver"
+                android:layout_width="38dp"
+                android:layout_height="73dp"
+                android:layout_centerInParent="true"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:src="@drawable/ic_baseline_phone_24" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -66,6 +66,54 @@
                     android:fontFamily="@font/bebas_nueve_regular"
                     android:textColor="@android:color/black"
                     android:textSize="30sp"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingLeft="@dimen/activity_margin"
+                    android:paddingRight="@dimen/activity_margin"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/txt_driver_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:text="@string/driver_name_example"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/bebas_nueve_regular"
+                        />
+
+                    <TextView
+                        android:id="@+id/separator_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:text="@string/separator"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/txt_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:text="4.66"
+                        android:fontFamily="@font/bebas_nueve_regular"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp"
+                        android:drawableRight="@drawable/ic_baseline_star_24"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -75,64 +123,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:orientation="horizontal"
-                android:layout_gravity="center_horizontal"
-                android:paddingLeft="@dimen/activity_margin"
-                android:paddingRight="@dimen/activity_margin"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                >
-
-                <TextView
-                    android:id="@+id/txt_driver_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="@string/driver_name_example"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/bebas_nueve_regular"
-                    />
-
-                <TextView
-                    android:id="@+id/separator_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:text="@string/separator"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    />
-
-                <TextView
-                    android:id="@+id/txt_rating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="4.66"
-                    android:fontFamily="@font/bebas_nueve_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    android:drawableRight="@drawable/ic_baseline_star_24"/>
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:orientation="horizontal"
-                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:layout_gravity="center"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:paddingRight="@dimen/activity_margin"
@@ -140,12 +140,18 @@
                 android:weightSum="16"
                 >
 
-                <ImageView
-                    android:id="@+id/img_call_driver"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_baseline_phone_24"
+
+
+                <TextView
+                    android:autoLink="phone"
+                    android:id="@+id/txt_phone_call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="0123456789"
+                    android:fontFamily="@font/bebas_nueve_regular"
+                    android:textColor="@android:color/black"
+                    android:textSize="25sp"
                     />
 
 

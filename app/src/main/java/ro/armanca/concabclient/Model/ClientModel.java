@@ -3,6 +3,7 @@ package ro.armanca.concabclient.Model;
 public class ClientModel {
 
     private String firstName, lastName, phoneNumber,avatar;
+    private double rating;
 
 
     public ClientModel() {
@@ -38,5 +39,13 @@ public class ClientModel {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }

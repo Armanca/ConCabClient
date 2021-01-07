@@ -7,14 +7,17 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.LinkMovementMethod;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
@@ -100,6 +103,11 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     ImageView img_driver;
     @BindView(R.id.txt_rating)
     TextView txt_rating;
+    @BindView(R.id.txt_car_number)
+    TextView txt_car_number;
+    @BindView(R.id.txt_phone_call)
+    TextView txt_phone_call;
+
 
 
     @BindView(R.id.fill_maps)
@@ -444,6 +452,9 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                                     .into(img_driver);
                                             txt_driver_name.setText(tripPlanModel.getDriverInfoModel().getFirstName());
                                             txt_rating.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getRating()));
+                                            txt_car_number.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getPlate()));
+                                            txt_phone_call.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getPhoneNumber()));
+
                                             confirm_pickup_layout.setVisibility(View.GONE);
                                             confirm_concab_layout.setVisibility(View.GONE);
                                             driver_info_layout.setVisibility(View.VISIBLE);
