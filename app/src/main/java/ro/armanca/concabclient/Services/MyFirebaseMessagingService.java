@@ -15,6 +15,7 @@ import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
+import ro.armanca.concabclient.Model.EventBus.DriverCompleteTripEvent;
 import ro.armanca.concabclient.Utils.UserUtils;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -47,6 +48,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                         String tripKey = dataRecv.get(Common.TRIP_KEY);
                                         EventBus.getDefault().postSticky(new DriverAcceptTripEvent(tripKey));
                                    }
+
+                else
+                    if(dataRecv.get(Common.NOTI_TITLE).equals(Common.CLIENT_COMPLETE_TRIP))
+                    {
+                        String tripKey = dataRecv.get(Common.TRIP_KEY);
+                        EventBus.getDefault().postSticky(new DriverCompleteTripEvent(tripKey));
+                    }
             else
                     Common.showNotification(this, new Random().nextInt(),
                         dataRecv.get(Common.NOTI_TITLE),

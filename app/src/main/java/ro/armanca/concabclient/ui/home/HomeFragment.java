@@ -65,6 +65,8 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -73,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,6 +90,7 @@ import ro.armanca.concabclient.Model.AnimationModel;
 import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.Model.DriverInfoModel;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
+import ro.armanca.concabclient.Model.EventBus.ShowNotificationFinishTrip;
 import ro.armanca.concabclient.Model.GeoQueryModel;
 import ro.armanca.concabclient.R;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
@@ -116,6 +120,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     private Location previousLocation, currentLocation;  // pt a calcula distanta
 
     private boolean firstTime = true;
+    private boolean isNextLaunch = false;
 
     //Listener
     IFFirebaseDriverInfoListener ifFirebaseDriverInfoListener;
@@ -125,6 +130,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private IGoogleAPI iGoogleAPI;
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
 
     @Override
     public void onStop() {
@@ -139,8 +150,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFFire
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
+        if(isNextLaunch)
+        {
+            loadAvailableDrivers();
+        }
+        else
+            isNextLaunch = true;
     }
 
 

@@ -62,6 +62,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +75,9 @@ import ro.armanca.concabclient.Model.DriverGeoModel;
 import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
+import ro.armanca.concabclient.Model.EventBus.DriverCompleteTripEvent;
 import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
+import ro.armanca.concabclient.Model.EventBus.ShowNotificationFinishTrip;
 import ro.armanca.concabclient.Model.TripPlanModel;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
@@ -351,7 +354,21 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             EventBus.getDefault().removeStickyEvent(DriverAcceptTripEvent.class);
         if(EventBus.getDefault().hasSubscriberForEvent(DeclineAndRemoveRequestFromDriver.class))
             EventBus.getDefault().removeStickyEvent(DeclineAndRemoveRequestFromDriver.class);
+        if(EventBus.getDefault().hasSubscriberForEvent(DriverCompleteTripEvent.class))
+            EventBus.getDefault().removeStickyEvent(DriverCompleteTripEvent.class);
         EventBus.getDefault().unregister(this);
+
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void onDriverCompleteTrip(DriverCompleteTripEvent event)
+    {
+
+        Common.showNotification(this, new Random().nextInt(),
+                "Cursă finalizată",
+                "Cursa cu numărul "+event.getTripKey() + " a luat sfârșit ",
+                null);
+        finish();
 
     }
 
@@ -493,16 +510,19 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            TripPlanModel newData =snapshot.getValue(TripPlanModel.class);
 
-                            String driverNewLocation = new StringBuilder()
-                                    .append(newData.getCurrentLat())
-                                    .append(",")
-                                    .append(newData.getCurrentLng())
-                                    .toString();
+                            if(snapshot.exists()) {
+                                TripPlanModel newData = snapshot.getValue(TripPlanModel.class);
 
-                            if(!driverOldPosition.equals(driverNewLocation))
-                                moveMarkerAnimation(destinationMarker,driverOldPosition,driverNewLocation);
+                                String driverNewLocation = new StringBuilder()
+                                        .append(newData.getCurrentLat())
+                                        .append(",")
+                                        .append(newData.getCurrentLng())
+                                        .toString();
+
+                                if (!driverOldPosition.equals(driverNewLocation))
+                                    moveMarkerAnimation(destinationMarker, driverOldPosition, driverNewLocation);
+                            }
 
                         }
 

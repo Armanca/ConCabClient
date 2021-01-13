@@ -56,6 +56,8 @@ public class Common {
     public static final String TRIP_KEY = "TripKey";
     public static final String TRIP = "Trips";
     public static final String REQUEST_DRIVER_DECLINE_AND_REMOVE_TRIP = "DeclineAndRemoveTrip";
+    public static final String CLIENT_COMPLETE_TRIP = "DriverCompleteTrip";
+
 
 
     public static ClientModel currentClient;
