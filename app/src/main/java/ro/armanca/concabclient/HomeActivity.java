@@ -126,7 +126,7 @@ public class HomeActivity extends AppCompatActivity {
 
         txt_name.setText(Common.buildWelcomeMessage());
         txt_phone.setText(Common.currentClient !=null ? Common.currentClient.getPhoneNumber(): "");
-        text_star.setText(Common.currentClient !=null ? String.valueOf(Common.currentClient.getRating()) : "5.0" );
+        text_star.setText(Common.currentClient !=null ? String.format("%.2f",Common.currentClient.getRating()) : "5.0" );
 
         img_avatar.setOnClickListener(v -> {
             Intent intent = new Intent();

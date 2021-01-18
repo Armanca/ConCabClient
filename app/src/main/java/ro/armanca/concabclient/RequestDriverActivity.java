@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +51,7 @@ import com.google.android.gms.maps.model.SquareCap;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
@@ -72,6 +74,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
+import ro.armanca.concabclient.Model.DriverInfoModel;
 import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
 import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
@@ -82,6 +85,8 @@ import ro.armanca.concabclient.Model.TripPlanModel;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
 import ro.armanca.concabclient.Utils.UserUtils;
+import java.text.DecimalFormat;
+
 
 public class RequestDriverActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -112,7 +117,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     TextView txt_phone_call;
 
 
-
     @BindView(R.id.fill_maps)
     View fill_maps;
 
@@ -122,7 +126,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private Circle lastUserCircle;
     private long duration = 1000;
     private ValueAnimator lastPulseAnimator;
-
     //Invartire camera
     private ValueAnimator animator;
     private static final int DESIRED_NUM_OF_SPINS=5;
@@ -134,6 +137,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private double lat,lng;
     private int index,next;
     private LatLng start,end;
+
+    private RatingBar ratingBar;
 
 
 
@@ -368,6 +373,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 "Cursă finalizată",
                 "Cursa cu numărul "+event.getTripKey() + " a luat sfârșit ",
                 null);
+
         finish();
 
     }
@@ -468,13 +474,27 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                                     .load(tripPlanModel.getDriverInfoModel().getAvatar())
                                                     .into(img_driver);
                                             txt_driver_name.setText(tripPlanModel.getDriverInfoModel().getFirstName());
-                                            txt_rating.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getRating()));
+                                            txt_rating.setText(String.format("%.2f",tripPlanModel.getDriverInfoModel().getRating()));
                                             txt_car_number.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getPlate()));
                                             txt_phone_call.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getPhoneNumber()));
 
                                             confirm_pickup_layout.setVisibility(View.GONE);
                                             confirm_concab_layout.setVisibility(View.GONE);
                                             driver_info_layout.setVisibility(View.VISIBLE);
+
+                                            ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+                                            ratingBar.setVisibility(View.VISIBLE);
+                                            ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                                                @Override
+                                                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+                                                   double ratingDB = tripPlanModel.getDriverInfoModel().getRating();
+                                                    Snackbar.make(main_layout,"Ati acordat " + rating+ " soferului " + tripPlanModel.getDriverInfoModel().getFirstName(),Snackbar.LENGTH_SHORT).show();
+                                                   DatabaseReference updateRatingDriver = FirebaseDatabase.getInstance().getReference(Common.DRIVER_INFO_REFERENCE).child(lastDriverCall.getKey()).child("rating");
+                                                   updateRatingDriver.setValue((ratingDB+rating)/2);
+                                                   ratingBar.setVisibility(View.GONE);
+                                                }
+                                            });
 
                                         }
                                         catch (Exception e){
@@ -496,6 +516,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 });
 
     }
+
+
 
     private void initDriverForMoving(String tripIp, TripPlanModel tripPlanModel) {
             driverOldPosition = new StringBuilder()
