@@ -63,6 +63,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -115,6 +116,9 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     TextView txt_car_number;
     @BindView(R.id.txt_phone_call)
     TextView txt_phone_call;
+    @BindView(R.id.txt_price_ride)
+    TextView txt_price_ride;
+
 
 
     @BindView(R.id.fill_maps)
@@ -142,18 +146,24 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
 
 
+
+
+
     @OnClick(R.id.btn_confirm_concab)
     void onConfirmConcab(){
+
         confirm_pickup_layout.setVisibility(View.VISIBLE);
         confirm_concab_layout.setVisibility(View.GONE);
-
         setDataPickup();
+
     }
+
 
     @OnClick(R.id.btn_confirm_pickup)
     void onConfirmPickup(){
         if(mMap == null) return;
         if(selectPlaceEvent == null) return;
+
 
         //golire harta
         mMap.clear();
@@ -179,6 +189,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         originMarker = mMap.addMarker(new MarkerOptions()
             .icon(BitmapDescriptorFactory.defaultMarker())
             .position(selectPlaceEvent.getOrigin()));
+
 
         addPulsatingEffect(selectPlaceEvent);
 
@@ -318,6 +329,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
     private void setDataPickup() {
         txt_address_pickup.setText(txt_origin != null ? txt_origin.getText() : "Gol");
+
         mMap.clear();;
         //adauga pickup marker
 
@@ -454,7 +466,10 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[0]),
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[1]));
 
-                                            LatLng destination = new LatLng(tripPlanModel.getCurrentLat(),tripPlanModel.getCurrentLng());
+                                           // LatLng destination = new LatLng(tripPlanModel.getCurrentLat(),tripPlanModel.getCurrentLng());
+                                            LatLng destination = new LatLng(
+                                                    Double.parseDouble(tripPlanModel.getDestination().split(",")[0]),
+                                                    Double.parseDouble(tripPlanModel.getDestination().split(",")[1]));
 
                                             LatLngBounds latLngBounds = new LatLngBounds.Builder()
                                                     .include(origin)
@@ -473,6 +488,21 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                             Glide.with(RequestDriverActivity.this)
                                                     .load(tripPlanModel.getDriverInfoModel().getAvatar())
                                                     .into(img_driver);
+
+                                            Location start1 = new Location("");
+                                            start1.setLatitude(origin.latitude);
+                                            start1.setLongitude(origin.longitude);
+                                            Location end1 = new Location("");
+                                            end1.setLatitude(destination.latitude);
+                                            end1.setLongitude(destination.longitude);
+                                            double price_ride = start1.distanceTo(end1);
+                                            if(price_ride<2500)
+                                            {
+                                                txt_price_ride.setText("6 RON ");
+
+                                            }
+                                            else
+                                                txt_price_ride.setText(String.format("%.2f",(price_ride/1000)*2.35)+" RON ");
                                             txt_driver_name.setText(tripPlanModel.getDriverInfoModel().getFirstName());
                                             txt_rating.setText(String.format("%.2f",tripPlanModel.getDriverInfoModel().getRating()));
                                             txt_car_number.setText(String.valueOf(tripPlanModel.getDriverInfoModel().getPlate()));
@@ -810,7 +840,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                         addOriginMarker(duration,start_address);
 
                         addDestinationMarker(end_address);
-
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,160));
                         mMap.moveCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom-1));
 
