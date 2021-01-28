@@ -144,11 +144,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
     private RatingBar ratingBar;
 
-
-
-
-
-
     @OnClick(R.id.btn_confirm_concab)
     void onConfirmConcab(){
 
@@ -332,7 +327,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
         mMap.clear();;
         //adauga pickup marker
-
         addPickupMarker();
     }
 
@@ -662,11 +656,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                     if(index < polylineList.size() -2)
                                         handler.postDelayed(this,1500);
                                     else
-                                        if(index<polylineList.size() -1)
-                                        {
-
-                                        }
-
+                                        if(index<polylineList.size() -1) { }
 
                                 }
                             },1500);
