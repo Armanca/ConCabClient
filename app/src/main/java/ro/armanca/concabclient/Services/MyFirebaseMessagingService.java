@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Random;
 
 import ro.armanca.concabclient.Common.Common;
-import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
-import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
-import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
-import ro.armanca.concabclient.Model.EventBus.DriverCompleteTripEvent;
+import ro.armanca.concabclient.EventBus.DeclineAndRemoveRequestFromDriver;
+import ro.armanca.concabclient.EventBus.DeclineRequestFromDriver;
+import ro.armanca.concabclient.EventBus.DriverAcceptTripEvent;
+import ro.armanca.concabclient.EventBus.DriverCompleteTripEvent;
 import ro.armanca.concabclient.Utils.UserUtils;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {

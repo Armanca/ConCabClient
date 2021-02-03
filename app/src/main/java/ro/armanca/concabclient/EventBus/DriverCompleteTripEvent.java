@@ -1,6 +1,6 @@
-package ro.armanca.concabclient.Model.EventBus;
+package ro.armanca.concabclient.EventBus;
 
-public class ShowNotificationFinishTrip {
+public class DriverCompleteTripEvent {
     private String tripKey;
 
     public String getTripKey() {
@@ -11,7 +11,7 @@ public class ShowNotificationFinishTrip {
         this.tripKey = tripKey;
     }
 
-    public ShowNotificationFinishTrip(String tripKey) {
+    public DriverCompleteTripEvent(String tripKey) {
         this.tripKey = tripKey;
     }
 }

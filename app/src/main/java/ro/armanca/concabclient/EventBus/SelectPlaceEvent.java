@@ -1,4 +1,4 @@
-package ro.armanca.concabclient.Model.EventBus;
+package ro.armanca.concabclient.EventBus;
 
 import com.google.android.gms.maps.model.LatLng;
 

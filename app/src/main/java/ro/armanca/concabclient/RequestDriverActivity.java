@@ -2,23 +2,15 @@ package ro.armanca.concabclient;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
 import android.animation.ValueAnimator;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.method.LinkMovementMethod;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -30,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -61,9 +52,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -75,18 +64,15 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
-import ro.armanca.concabclient.Model.DriverInfoModel;
-import ro.armanca.concabclient.Model.EventBus.DeclineAndRemoveRequestFromDriver;
-import ro.armanca.concabclient.Model.EventBus.DeclineRequestFromDriver;
-import ro.armanca.concabclient.Model.EventBus.DriverAcceptTripEvent;
-import ro.armanca.concabclient.Model.EventBus.DriverCompleteTripEvent;
-import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
-import ro.armanca.concabclient.Model.EventBus.ShowNotificationFinishTrip;
+import ro.armanca.concabclient.EventBus.DeclineAndRemoveRequestFromDriver;
+import ro.armanca.concabclient.EventBus.DeclineRequestFromDriver;
+import ro.armanca.concabclient.EventBus.DriverAcceptTripEvent;
+import ro.armanca.concabclient.EventBus.DriverCompleteTripEvent;
+import ro.armanca.concabclient.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Model.TripPlanModel;
 import ro.armanca.concabclient.Remote.IGoogleAPI;
 import ro.armanca.concabclient.Remote.RetrofitClient;
 import ro.armanca.concabclient.Utils.UserUtils;
-import java.text.DecimalFormat;
 
 
 public class RequestDriverActivity extends FragmentActivity implements OnMapReadyCallback {

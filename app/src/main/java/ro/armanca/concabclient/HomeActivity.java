@@ -28,16 +28,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import ro.armanca.concabclient.Common.Common;
-import ro.armanca.concabclient.Model.EventBus.ShowNotificationFinishTrip;
 import ro.armanca.concabclient.Utils.UserUtils;
 
 public class HomeActivity extends AppCompatActivity {

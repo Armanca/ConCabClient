@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -18,22 +17,17 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ro.armanca.concabclient.Common.Common;
 import ro.armanca.concabclient.Model.DriverGeoModel;
-import ro.armanca.concabclient.Model.EventBus.SelectPlaceEvent;
-import ro.armanca.concabclient.Model.FCMResponse;
+import ro.armanca.concabclient.EventBus.SelectPlaceEvent;
 import ro.armanca.concabclient.Model.FCMSendData;
 import ro.armanca.concabclient.Model.TokenModel;
 import ro.armanca.concabclient.R;
 import ro.armanca.concabclient.Remote.IFCMService;
-import ro.armanca.concabclient.Remote.RetrofitClient;
 import ro.armanca.concabclient.Remote.RetrofitFCMClient;
-import ro.armanca.concabclient.RequestDriverActivity;
 
 public class UserUtils {
 

@@ -1,4 +1,4 @@
-package ro.armanca.concabclient.Model.EventBus;
+package ro.armanca.concabclient.EventBus;
 
 public class DriverAcceptTripEvent {
     private String tripIp;
