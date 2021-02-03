@@ -182,6 +182,7 @@ public class StartScreenActivity extends AppCompatActivity {
                 model.setFirstName(edt_first_name.getText().toString());
                 model.setLastName(edt_last_name.getText().toString());
                 model.setPhoneNumber(edt_phone_number.getText().toString());
+                model.setRating(5.0);
 
                 clientInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .setValue(model)
@@ -210,7 +211,6 @@ public class StartScreenActivity extends AppCompatActivity {
                 .setPhoneButtonId(R.id.btn_phone_sign_in)
                 .setGoogleButtonId(R.id.btn_google_sign_in)
                 .build();
-
         startActivityForResult(AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAuthMethodPickerLayout(authMethodPickerLayout)

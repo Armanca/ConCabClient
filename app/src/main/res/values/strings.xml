@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">ConCab Client</string>
-    <string name="register_text">Let\'s start with creating your account</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
-    <string name="phone_number">Phone Number</string>
-    <string name="continue_text">Continue</string>
+    <string name="register_text">Comunicați datele dvs.</string>
+    <string name="first_name">Prenumele</string>
+    <string name="last_name">Numele</string>
+    <string name="phone_number">Numărul de telefon</string>
+    <string name="continue_text">Continuă</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
